@@ -17,7 +17,8 @@ class Phonebook:
     def print_phonebook(self) -> None:
         phonebook_list = self.get_phonebook_from_file(self.FILE_NAME)
         # НЕ ЗАБУДЬ ПЕРЕНЕСТИ ДЛИННУЮ СТРОКУ
-        print("\n№   | Имя              | Фамилия                 | Отчество                 | Название организации        | Рабочий телефон   | Личный телефон")
+        print("\n№   | Имя              | Фамилия                 | Отчество                 "
+              "| Название организации        | Рабочий телефон   | Личный телефон")
         # print("\033[H\033[J")
         for note in phonebook_list:
             number = note[0]
@@ -29,6 +30,7 @@ class Phonebook:
             cellphone = note[6]
             print("{:-<150}".format("-"))
             print("{:<6}{:<19}{:<26}{:<27}{:<30}{:<20}{:<20}".format(number, name, surname, patronymic, organization, work_phone, cellphone))
+
 
     def add_new_note(self, filename: str) -> None:
         name = input("Введите имя: ")
@@ -42,13 +44,10 @@ class Phonebook:
         new_note = "*".join(new_note)
         try:
             with open(filename, "a", encoding="utf-8") as file:
-                # тут полученные данные должны сохраняться в список,
-                # соединяются звездочкой и записываются в файл
                 file.write(new_note + "\n")
         except FileNotFoundError as e:
             print(e)
 
-    #     НУЖНА ФУНКЦИЯ ОБНОВЛЕНИЯ СПИСКА, ПОЛУЧЕННОГО ИЗ ФАЙЛА
 
 
 one = Phonebook()
@@ -63,9 +62,10 @@ def main_menu(prev_param: int = 0) -> None:
     [1] - Показать справочник
     [2] - Добавить новую запись в справочник
     [3] - Редактировать запись
-    [4] - Закрыть приложение
+    [4] - Поиск записей по одной или нескольким характеристикам
+    [5] - Закрыть приложение
     """)
-
+    print("\033[H\033[J")
     if param == "1":
         one.print_phonebook()
     elif param == "2":
@@ -74,11 +74,12 @@ def main_menu(prev_param: int = 0) -> None:
     elif param == "3":
         print("тут будет функция редактирования записи")
     elif param == "4":
+        print("тут будет функция поиска записи")
+    elif param == "5":
         exit("Увидимся в следующий раз.")
     else:
         print("\033[H\033[J")
-        print("Вы ввели неверный параметр.")
-        prev_param = -1
+        print("Вы ввели неверный параметр. Попробуйте еще раз:")
 
     main_menu()
 
