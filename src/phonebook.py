@@ -4,16 +4,18 @@ from sys import exit
 class Phonebook:
 
     def get_phonebook_from_file(self, filename: str) -> list:
+        # ТУТ ДОЛЖЕН БЫТЬ СПИСОК СПИСКОВ
         try:
             with open(filename, "r+", encoding="utf-8") as file:
-                result = [str.split("*") for str in file.readlines() if str != "\n"]
+                result = [str.strip("\n").split("*") for str in file.readlines() if str != "\n"]
                 return result
         except FileNotFoundError as e:
             print(e)
 
     def print_phonebook(self, phonebook_list: list) -> None:
-        print(
-            "\n№   | Имя              | Фамилия                 | Отчество                 | Название организации   | Рабочий телефон   | Личный телефон")
+        # НЕ ЗАБУДЬ ПЕРЕНЕСТИ ДЛИННУЮ СТРОКУ
+        print("\n№   | Имя              | Фамилия                 | Отчество                 | Название организации   | Рабочий телефон   | Личный телефон")
+        # print("\033[H\033[J")
         for note in phonebook_list:
             number = note[0]
             name = note[1]
@@ -27,8 +29,18 @@ one = Phonebook()
 res = one.get_phonebook_from_file("source.txt")
 
 
-def start_game():
-    prev_param = 0
+def add_new_note(filename: str) -> None:
+    try:
+        with open(filename, "a", encoding="utf-8") as file:
+            # тут полученные данные должны сохраняться в список,
+            # соединяются звездочкой и записываются в файл
+            file.write("check"+"\n")
+    except FileNotFoundError as e:
+        print(e)
+
+#     НУЖНА ФУНКЦИЯ ОБНОВЛЕНИЯ СПИСКА, ПОЛУЧЕННОГО ИЗ ФАЙЛА
+
+def main_menu(prev_param: int = 0) -> None:
     param = input(
         """
     [1] - Показать справочник
@@ -37,18 +49,23 @@ def start_game():
     [4] - Закрыть приложение
     """)
 
-    if param == '1':
-        print("\033[H\033[J")
+    if param == "1":
         one.print_phonebook(res)
-        start_game()
-        prev_param = 1
-    elif param == '4':
-        exit('Увидимся в следующий раз.')
+    elif param == "2":
+        add_new_note("source.txt")
+        print("Запись добавлена в справочник.")
+    elif param == "3":
+        print("тут будет функция редактирования записи")
+    elif param == "4":
+        exit("Увидимся в следующий раз.")
     else:
         print("\033[H\033[J")
-        print('Вы ввели неверный параметр.')
+        print("Вы ввели неверный параметр.")
         prev_param = -1
-        start_game()
+
+    main_menu()
 
 
-start_game()
+
+
+main_menu()
