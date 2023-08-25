@@ -62,12 +62,12 @@ class Phonebook:
             str_for_edit = ""
             for note in phonebook_list:
                 if note[0] == number:
-                    str_for_edit = note
-            return str_for_edit
+                    line_for_edit = note
+            return line_for_edit
 
 
-    def add_edited_note(self, str_for_edit: str) -> None:
-        str_number_in_file = int(str_for_edit[0]) + 1
+    def add_edited_note(self, line_for_edit: list) -> None:
+        str_number_in_file = int(line_for_edit[0]) + 1
 
         param = input("""
         Какой параметр хотите изменить? Введите соответствующую цифру:
@@ -81,23 +81,19 @@ class Phonebook:
         """)
 
         if param == "7":
-            # ТУТ НАДО СДЕЛАТЬ ЗАМЕНУ СТРОКИ
-            # try:
-            #     with open(self.FILE_NAME, "r+", encoding="utf-8") as file:
-            #         result = [str.strip("\n").split("*") for str in file.readlines() if str != "\n"]
-            #         return result
-            # except FileNotFoundError as e:
-            #     print(e)
-            ...
+            try:
+                with open(self.FILE_NAME, "r+", encoding="utf-8") as file:
+                    lines = file.readlines()
+                    lines.pop(str_number_in_file)
+                    lines[str_number_in_file] = "*".join(line_for_edit) + "\n"
+                    file.seek(0)
+                    file.writelines(lines)
+            except FileNotFoundError as e:
+                print(e)
+
         else:
-            str_for_edit[param] = input("Введите новое значение: ")
-            self.add_edited_note(str_for_edit)
-            # if param == "1":
-            #     str_for_edit[1] = input("Введите новое имя: ")
-            # elif param == "2":
-            #     str_for_edit[2] = input("Введите новую фамилию: ")
-            # elif param == "3":
-            #     str_for_edit[3] = input("Введите новую фамилию: ")
+            line_for_edit[int(param)] = input("Введите новое значение: ")
+            self.add_edited_note(line_for_edit)
 
     
 
