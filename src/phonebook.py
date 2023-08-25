@@ -68,8 +68,8 @@ class Phonebook:
 
 
     def add_edited_note(self, line_for_edit: list) -> None:
-        str_number_in_file = int(line_for_edit[0]) + 1
-        print("Выбранная запись: ", " ".join(line_for_edit))
+        str_number_in_file = int(line_for_edit[0]) - 1
+        print("\nВыбранная запись: ", " ".join(line_for_edit))
         param = input("""
         Какой параметр хотите изменить? Введите соответствующую цифру:
         [1] - Имя
@@ -78,10 +78,11 @@ class Phonebook:
         [4] - Название организации
         [5] - Рабочий телефон
         [6] - Личный телефон
-        [7] - Закончить редактирование и сохранить запись
+                      
         """)
 
-        if param == "7":
+        if param in ["1", "2", "3", "4", "5", "6"]:
+            line_for_edit[int(param)] = input("\nВведите новое значение: ")
             try:
                 with open(self.FILE_NAME, "r+", encoding="utf-8") as file:
                     lines = file.readlines()
@@ -90,10 +91,12 @@ class Phonebook:
                     file.writelines(lines)
             except FileNotFoundError as e:
                 print(e)
-        # ДОБАВИТЬ ВАЛИДАЦИЮ ??????????????????????????????????
         else:
-            line_for_edit[int(param)] = input("Введите новое значение: ")
-            self.add_edited_note(line_for_edit)
+            print("Вы ввели неверный параметр. Попробуйте еще раз:")
+            main_menu()
+
+        # ДОБАВИТЬ ВАЛИДАЦИЮ ??????????????????????????????????
+ 
 
 
 
@@ -109,6 +112,7 @@ class Phonebook:
         [5] - Рабочий телефон
         [6] - Личный телефон
         [7] - Вернуться в главное меню
+                      
         """)
 
         if "7" in param:
@@ -116,26 +120,27 @@ class Phonebook:
         else:
             result_list = []
             param_list = param.split(" ")
-            
+            local_result_list = phonebook_list
             for p in param_list:
-                find_notes()
-                value = input(f"Введите значение для поиска для параметра {p}: ")
-                local_result_list = []
-                local_result_list = [note for note in phonebook_list if note[int(p)] == value]
-                # print("local_result_list", local_result_list)
-                result_list.extend(local_result_list)
+                local_result_list = self.find_notes(p, local_result_list)
+                # find_notes(p, )
+                # value = input(f"Введите значение для поиска для параметра {p}: ")
+                # local_result_list = []
+                # local_result_list = [note for note in phonebook_list if note[int(p)] == value]
+                # # print("local_result_list", local_result_list)
+                # result_list.extend(local_result_list)
             
-            return result_list
+            return local_result_list
             
 
-    def find_notes(self, param_list: list, phonebook_list) -> None:
-        value = input(f"Введите значение для поиска для параметра {p}: ")
+    def find_notes(self, param: str, phonebook_list) -> list:
+        value = input(f"Введите значение для поиска для параметра {param}: ")
         local_result_list = []
-        local_result_list = [note for note in phonebook_list if note[int(p)] == value]
+        local_result_list = [note for note in phonebook_list if note[int(param)] == value]
         # print("local_result_list", local_result_list)
-        result_list.extend(local_result_list)
+        # result_list.extend(local_result_list)
             
-        return result_list
+        return local_result_list
 
 
 
@@ -155,6 +160,7 @@ def main_menu() -> None:
     [3] - Редактировать запись
     [4] - Поиск записей по одной или нескольким характеристикам
     [5] - Закрыть приложение
+
     """)
     print("\033[H\033[J")
 
@@ -163,17 +169,17 @@ def main_menu() -> None:
         one.print_phonebook(one.get_phonebook_from_file(one.FILE_NAME))
     elif param == "2":
         one.add_new_note(one.FILE_NAME)
-        print("Запись добавлена в справочник.")
+        print("\nЗапись добавлена в справочник.")
     elif param == "3":
        one.add_edited_note(one.get_edit_str())
-       print("Запись отредактирована.")
+       print("\nЗапись отредактирована.")
     elif param == "4":  
-        one.print_phonebook(one.find_notes(one.get_phonebook_from_file(one.FILE_NAME)))
+        one.print_phonebook(one.get_param_for_find(one.get_phonebook_from_file(one.FILE_NAME)))
     elif param == "5":
         exit("Увидимся в следующий раз.")
     else:
         print("\033[H\033[J")
-        print("Вы ввели неверный параметр. Попробуйте еще раз:")
+        print("\nВы ввели неверный параметр. Попробуйте еще раз:")
 
     main_menu()
 
