@@ -15,8 +15,8 @@ class Phonebook:
             print(e)
 
 
-    def print_phonebook(self) -> None:
-        phonebook_list = self.get_phonebook_from_file(self.FILE_NAME)
+    def print_phonebook(self, phonebook_list) -> None:
+        print("\033[H\033[J")
         print("\n№   | Имя              | Фамилия                 | Отчество                 "
               "| Название организации        | Рабочий телефон   | Личный телефон")
         for note in phonebook_list:
@@ -50,6 +50,7 @@ class Phonebook:
             print(e)
 
 
+
     def get_edit_str(self) -> str:
         number = input("Введите номер записи, которую хотите отредактировать. Если хотите снова пролистать справочник, введите \"смт\": ")
         
@@ -59,16 +60,16 @@ class Phonebook:
         # ДОБАВИТЬ ВАЛИДАЦИЮ ВХОДНЫХ ДАННЫХ
         else:
             phonebook_list = self.get_phonebook_from_file(self.FILE_NAME)
-            str_for_edit = ""
             for note in phonebook_list:
                 if note[0] == number:
                     line_for_edit = note
             return line_for_edit
 
 
+
     def add_edited_note(self, line_for_edit: list) -> None:
         str_number_in_file = int(line_for_edit[0]) + 1
-
+        print("Выбранная запись: ", " ".join(line_for_edit))
         param = input("""
         Какой параметр хотите изменить? Введите соответствующую цифру:
         [1] - Имя
@@ -84,18 +85,61 @@ class Phonebook:
             try:
                 with open(self.FILE_NAME, "r+", encoding="utf-8") as file:
                     lines = file.readlines()
-                    lines.pop(str_number_in_file)
                     lines[str_number_in_file] = "*".join(line_for_edit) + "\n"
                     file.seek(0)
                     file.writelines(lines)
             except FileNotFoundError as e:
                 print(e)
-
+        # ДОБАВИТЬ ВАЛИДАЦИЮ ??????????????????????????????????
         else:
             line_for_edit[int(param)] = input("Введите новое значение: ")
             self.add_edited_note(line_for_edit)
 
-    
+
+
+    def get_param_for_find(self, phonebook_list) -> list:
+        param = input("""
+        По какому параметру хотите искать? Введите одну или несколько цифр через пробел:
+                      
+        [0] - Порядковый номер
+        [1] - Имя
+        [2] - Фамилия
+        [3] - Отчество
+        [4] - Название организации
+        [5] - Рабочий телефон
+        [6] - Личный телефон
+        [7] - Вернуться в главное меню
+        """)
+
+        if "7" in param:
+            print("\033[H\033[J")
+        else:
+            result_list = []
+            param_list = param.split(" ")
+            
+            for p in param_list:
+                find_notes()
+                value = input(f"Введите значение для поиска для параметра {p}: ")
+                local_result_list = []
+                local_result_list = [note for note in phonebook_list if note[int(p)] == value]
+                # print("local_result_list", local_result_list)
+                result_list.extend(local_result_list)
+            
+            return result_list
+            
+
+    def find_notes(self, param_list: list, phonebook_list) -> None:
+        value = input(f"Введите значение для поиска для параметра {p}: ")
+        local_result_list = []
+        local_result_list = [note for note in phonebook_list if note[int(p)] == value]
+        # print("local_result_list", local_result_list)
+        result_list.extend(local_result_list)
+            
+        return result_list
+
+
+
+
 
 one = Phonebook()
 
@@ -114,16 +158,17 @@ def main_menu() -> None:
     """)
     print("\033[H\033[J")
 
+    
     if param == "1":
-        one.print_phonebook()
+        one.print_phonebook(one.get_phonebook_from_file(one.FILE_NAME))
     elif param == "2":
         one.add_new_note(one.FILE_NAME)
         print("Запись добавлена в справочник.")
     elif param == "3":
        one.add_edited_note(one.get_edit_str())
        print("Запись отредактирована.")
-    elif param == "4":
-        print("тут будет функция поиска записи")
+    elif param == "4":  
+        one.print_phonebook(one.find_notes(one.get_phonebook_from_file(one.FILE_NAME)))
     elif param == "5":
         exit("Увидимся в следующий раз.")
     else:
