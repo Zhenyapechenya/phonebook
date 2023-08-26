@@ -10,7 +10,7 @@ def get_phonebook_from_file(filename: str = FILE_NAME) -> list:
         with open(filename, "r+", encoding="utf-8") as file:
             result = [str.strip("\n").split("*") for str in file.readlines() if str != "\n"]
             return result
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         exit('Файл со справочником не найден.')
 
 
@@ -53,7 +53,6 @@ def print_phonebook(phonebook_list: list, items_per_page: int = 10, current_page
 
 
 def add_new_note(filename: str = FILE_NAME) -> None:
-    # ДОБАВИТЬ ВАЛИДАЦИЮ ВХОДНЫХ ДАННЫХ
     name = input("Введите имя: ")
     surname = input("Введите фамилию: ")
     patronymic = input("Введите отчество: ")
@@ -71,12 +70,11 @@ def add_new_note(filename: str = FILE_NAME) -> None:
 
 
 
-def get_edit_str() -> str:
+def get_edit_line() -> list:
     number = input("Введите номер записи, которую хотите отредактировать. Если хотите снова пролистать справочник, введите \"смт\": ")
     if number == "смт":
         print_phonebook(get_phonebook_from_file())
         main_menu()
-    # ДОБАВИТЬ ВАЛИДАЦИЮ ВХОДНЫХ ДАННЫХ
     else:
         phonebook_list = get_phonebook_from_file()
         for note in phonebook_list:
@@ -114,8 +112,6 @@ def add_edited_note(line_for_edit: list) -> None:
         print("Вы ввели неверный параметр. Попробуйте еще раз:")
         main_menu()
 
-    # ДОБАВИТЬ ВАЛИДАЦИЮ ??????????????????????????????????
-
 
 
 def get_param_for_find(phonebook_list: list) -> list:
@@ -139,7 +135,7 @@ def get_param_for_find(phonebook_list: list) -> list:
         for p in param_list:
             local_result_list = find_notes(p, local_result_list)
         return local_result_list
-            
+
 
 
 def find_notes(param: str, phonebook_list: list) -> list:
@@ -166,10 +162,11 @@ def main_menu() -> None:
         add_new_note()
         print("\Запись добавлена в справочник.")
     elif param == "3":
-        add_edited_note(get_edit_str())
+        add_edited_note(get_edit_line())
         print("\nЗапись отредактирована.")
     elif param == "4":  
         list_from_file = get_phonebook_from_file()
+        print(list_from_file)
         print_phonebook(get_param_for_find(list_from_file))
     elif param == "5":
         exit("Увидимся в следующий раз!\n")

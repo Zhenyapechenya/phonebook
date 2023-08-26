@@ -9,8 +9,8 @@
 9*nine*charles*turn*ooo*4564*2525
 10*ten*ten*fff*fff*33*777
 11*ele*elev*el*eee*123*3434
-12*12*twe*1*twe*12*12
-13*tree*13*13*13*13*13
+12*12*twe*1*twe*12*777
+13*tree*13*13*13*13*666666
 14*fifa*14*14*14*14*14
 15*fif*15*15*ooo*15*15
 16*1*f*f*f*f*f
