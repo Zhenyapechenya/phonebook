@@ -1,11 +1,6 @@
 from sys import exit
 
 
-
-items_per_page = 10
-current_page = 1
-
-
 class Phonebook:
 
     FILE_NAME = "source.txt"
@@ -20,23 +15,30 @@ class Phonebook:
             print(e)
 
 
-    def print_phonebook(self, phonebook_list, start, end) -> None:
-        print("\033[H\033[J")
-        print("\n№   | Имя              | Фамилия                 | Отчество                 "
-              "| Название организации        | Рабочий телефон   | Личный телефон")
-        
-        # items_per_page = 10
-        # current_page = 1
+    def print_phonebook(self, phonebook_list) -> None:   
+        items_per_page = 10
+        current_page = 1
         num_pages = len(phonebook_list) // items_per_page + 1
 
         while True:
             # выводим элементы списка для текущей страницы
             start_index = (current_page - 1) * items_per_page
             end_index = start_index + items_per_page
-            print(phonebook_list[start_index:end_index])
-
-
-            one.print_phonebook(phonebook_list, start_index, end_index)
+            # print(phonebook_list[start_index:end_index])
+            print("\033[H\033[J")
+            print("\n№   | Имя              | Фамилия                 | Отчество                 "
+                "| Название организации        | Рабочий телефон   | Личный телефон")
+            for note in phonebook_list[start_index:end_index]:
+                number = note[0]
+                name = note[1]
+                surname = note[2]
+                patronymic = note[3]
+                organization = note[4]
+                work_phone = note[5]
+                cellphone = note[6]
+                print("{:-<150}".format("-"))
+                print("{:<6}{:<19}{:<26}{:<27}{:<30}{:<20}{:<20}".format(number, name, surname, patronymic, organization, work_phone, cellphone))
+            # one.print_phonebook(phonebook_list, start_index, end_index)
 
             # спрашиваем у пользователя, хочет ли он перейти на другую страницу
             user_input = input("\nEnter page number or 'q' to quit: ")
@@ -52,19 +54,6 @@ class Phonebook:
             except ValueError:
                 print("\nInvalid input. Please enter a number between 1 and", num_pages)
 
-
-
-        for note in phonebook_list[start:end]:
-            number = note[0]
-            name = note[1]
-            surname = note[2]
-            patronymic = note[3]
-            organization = note[4]
-            work_phone = note[5]
-            cellphone = note[6]
-            print("{:-<150}".format("-"))
-            print("{:<6}{:<19}{:<26}{:<27}{:<30}{:<20}{:<20}".format(number, name, surname, patronymic, organization, work_phone, cellphone))
-        # ДОБАВИТЬ ПРОЛИСТЫВАНИЕ
 
 
     def add_new_note(self, filename: str) -> None:
@@ -174,37 +163,6 @@ class Phonebook:
 one = Phonebook()
 
 
-def print_page():
-    # items_per_page = 10
-    # current_page = 1
-
-    # пример списка для вывода
-    my_list = one.get_phonebook_from_file(one.FILE_NAME)
-
-    # вычисляем количество страниц
-    num_pages = len(my_list) // items_per_page + 1
-
-    while True:
-        # выводим элементы списка для текущей страницы
-        start_index = (current_page - 1) * items_per_page
-        end_index = start_index + items_per_page
-        print(my_list[start_index:end_index])
-        one.print_phonebook(my_list, start_index, end_index)
-
-        # спрашиваем у пользователя, хочет ли он перейти на другую страницу
-        user_input = input("\nEnter page number or 'q' to quit: ")
-        if user_input == 'q':
-            break
-
-        # обрабатываем пользовательский ввод
-        try:
-            page_number = int(user_input)
-            if page_number < 1 or page_number > num_pages:
-                raise ValueError
-            current_page = page_number
-        except ValueError:
-            print("\nInvalid input. Please enter a number between 1 and", num_pages)
-
 
 
 def main_menu() -> None:
@@ -240,7 +198,7 @@ def main_menu() -> None:
     elif param == "5":
         exit("Увидимся в следующий раз!\n")
     elif param == "6":
-        print_page()
+        one.print_phonebook(one.get_phonebook_from_file(one.FILE_NAME))
     else:
         print("\033[H\033[J")
         print("\nВы ввели неверный параметр. Попробуйте еще раз:")
