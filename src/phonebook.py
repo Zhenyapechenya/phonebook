@@ -1,5 +1,8 @@
 from sys import exit
 
+items_per_page = 10
+current_page = 1
+
 
 class Phonebook:
 
@@ -15,16 +18,14 @@ class Phonebook:
             print(e)
 
 
-    def print_phonebook(self, phonebook_list) -> None:   
-        items_per_page = 10
-        current_page = 1
+    def print_phonebook(self, phonebook_list, items_per_page, current_page) -> None:   
         num_pages = len(phonebook_list) // items_per_page + 1
-
+        flag_error = 0
+        
         while True:
-            # выводим элементы списка для текущей страницы
             start_index = (current_page - 1) * items_per_page
             end_index = start_index + items_per_page
-            # print(phonebook_list[start_index:end_index])
+
             print("\033[H\033[J")
             print("\n№   | Имя              | Фамилия                 | Отчество                 "
                 "| Название организации        | Рабочий телефон   | Личный телефон")
@@ -38,22 +39,23 @@ class Phonebook:
                 cellphone = note[6]
                 print("{:-<150}".format("-"))
                 print("{:<6}{:<19}{:<26}{:<27}{:<30}{:<20}{:<20}".format(number, name, surname, patronymic, organization, work_phone, cellphone))
-            # one.print_phonebook(phonebook_list, start_index, end_index)
 
-            # спрашиваем у пользователя, хочет ли он перейти на другую страницу
-            user_input = input("\nEnter page number or 'q' to quit: ")
-            if user_input == 'q':
+            if flag_error == 1:
+                print("\nНекорректный ввод. Введите номер между 1 и", num_pages)
+            user_input = input(f"\nВведите номер страницы от 1 до {num_pages} или \"вых\", чтобы вернуться в главное меню: ")
+            if user_input == "вых":
                 break
-
-            # обрабатываем пользовательский ввод
             try:
                 page_number = int(user_input)
                 if page_number < 1 or page_number > num_pages:
                     raise ValueError
                 current_page = page_number
             except ValueError:
-                print("\nInvalid input. Please enter a number between 1 and", num_pages)
+                flag_error = 1
+                
 
+            
+                
 
 
     def add_new_note(self, filename: str) -> None:
@@ -164,9 +166,9 @@ one = Phonebook()
 
 
 
-
 def main_menu() -> None:
     # ПОПРОБОВАТЬ ИЗМЕНИТЬ РАЗМЕР ОКНА ТЕРМИНАЛА
+
     param = input(
     """
     [1] - Показать справочник
@@ -174,38 +176,27 @@ def main_menu() -> None:
     [3] - Редактировать запись
     [4] - Поиск записей по одной или нескольким характеристикам
     [5] - Закрыть приложение
-    [6] - test
 
     """)
     print("\033[H\033[J")
+    list_from_file = one.get_phonebook_from_file(one.FILE_NAME)
 
-    
     if param == "1":
-        one.print_phonebook(one.get_phonebook_from_file(one.FILE_NAME))
+        one.print_phonebook(list_from_file, items_per_page, current_page)
     elif param == "2":
-        print("TWO")
         one.add_new_note(one.FILE_NAME)
         print("\nЗапись добавлена в справочник.")
     elif param == "3":
-       print("THREE")
-       tmp = one.get_edit_str()
-       print(tmp)
-       one.add_edited_note(tmp)
-    #    one.add_edited_note(one.get_edit_str())
-       print("\nЗапись отредактирована.")
+        one.add_edited_note(one.get_edit_str())
+        print("\nЗапись отредактирована.")
     elif param == "4":  
-        one.print_phonebook(one.get_param_for_find(one.get_phonebook_from_file(one.FILE_NAME)))
+        one.print_phonebook(one.get_param_for_find(list_from_file), items_per_page, current_page)
     elif param == "5":
         exit("Увидимся в следующий раз!\n")
-    elif param == "6":
-        one.print_phonebook(one.get_phonebook_from_file(one.FILE_NAME))
     else:
-        print("\033[H\033[J")
         print("\nВы ввели неверный параметр. Попробуйте еще раз:")
 
     main_menu()
-
-
 
 
 main_menu()
