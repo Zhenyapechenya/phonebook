@@ -11,14 +11,14 @@ def get_phonebook_from_file(filename: str = FILE_NAME) -> list:
             result = [str.strip("\n").split("*") for str in file.readlines() if str != "\n"]
             return result
     except FileNotFoundError:
-        exit('Файл со справочником не найден.')
+        exit('Файл со справочником не найден.\n')
 
 
 
-def print_phonebook(phonebook_list: list, items_per_page: int = 10, current_page: int = 1) -> None:   
+def print_phonebook(phonebook_list: list, items_per_page: int = 10, current_page: int = 1) -> None:
     num_pages = len(phonebook_list) // items_per_page + 1
     flag_error = 0
-    
+
     while True:
         start_index = (current_page - 1) * items_per_page
         end_index = start_index + items_per_page
@@ -47,6 +47,7 @@ def print_phonebook(phonebook_list: list, items_per_page: int = 10, current_page
             if page_number < 1 or page_number > num_pages:
                 raise ValueError
             current_page = page_number
+            flag_error = 0
         except ValueError:
             flag_error = 1
 
@@ -66,7 +67,7 @@ def add_new_note(filename: str = FILE_NAME) -> None:
         with open(filename, "a", encoding="utf-8") as file:
             file.write(new_note + "\n")
     except FileNotFoundError as e:
-        exit('Файл со справочником не найден.')
+        exit('Файл со справочником не найден.\n')
 
 
 
@@ -80,12 +81,15 @@ def get_edit_line() -> list:
         for note in phonebook_list:
             if note[0] == number:
                 return note
+            else:
+                print("\nТакой записи нет. Попробуйте еще раз.\n")
+                return get_edit_line()
 
 
 
 def add_edited_note(line_for_edit: list) -> None:
     str_number_in_file = int(line_for_edit[0]) - 1
-    print("\nВыбранная запись: ", " ".join(line_for_edit))
+    print("\nВыбранная запись: ", " ".join(line_for_edit[1:]))
     param = input("""
     Какой параметр хотите изменить? Введите соответствующую цифру:\n
     [1] - Имя
@@ -110,13 +114,13 @@ def add_edited_note(line_for_edit: list) -> None:
             exit('Файл со справочником не найден.')
     else:
         print("Вы ввели неверный параметр. Попробуйте еще раз:")
-        main_menu()
+        add_edited_note(line_for_edit)
 
 
 
 def get_param_for_find(phonebook_list: list) -> list:
     param = input("""
-    По какому параметру хотите искать? Введите одну или несколько цифр через пробел:\n
+По какому параметру хотите искать? Введите одну или несколько цифр через пробел\n(после последней цифры не нужен):\n
     [0] - Порядковый номер
     [1] - Имя
     [2] - Фамилия
@@ -129,8 +133,13 @@ def get_param_for_find(phonebook_list: list) -> list:
 
     if "7" in param:
         print("\033[H\033[J")
+        return [-1]
     else:
         param_list = param.split(" ")
+        for par in param_list:
+            if par not in ["0", "1", "2", "3", "4", "5", "6"]:
+                print("Таких параметров нет. Попробуйте еще раз.")
+                return get_param_for_find(phonebook_list)
         local_result_list = phonebook_list
         for p in param_list:
             local_result_list = find_notes(p, local_result_list)
@@ -160,14 +169,16 @@ def main_menu() -> None:
         print_phonebook(get_phonebook_from_file())
     elif param == "2":
         add_new_note()
-        print("\Запись добавлена в справочник.")
+        print("\nЗапись добавлена в справочник.")
     elif param == "3":
         add_edited_note(get_edit_line())
         print("\nЗапись отредактирована.")
-    elif param == "4":  
-        list_from_file = get_phonebook_from_file()
-        print(list_from_file)
-        print_phonebook(get_param_for_find(list_from_file))
+    elif param == "4":
+        founded_list = get_param_for_find(get_phonebook_from_file())
+        if founded_list == [-1]:
+            main_menu()
+        else:
+            print_phonebook(founded_list)
     elif param == "5":
         exit("Увидимся в следующий раз!\n")
     else:
