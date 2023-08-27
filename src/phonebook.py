@@ -8,7 +8,7 @@ FILE_NAME = "src/source.txt"
 def get_phonebook_from_file(filename: str = FILE_NAME) -> list:
     try:
         with open(filename, "r+", encoding="utf-8") as file:
-            result = [str.strip("\n").split("*") for str in file.readlines() if str != "\n"]
+            result: list = [str.strip("\n").split("*") for str in file.readlines() if str != "\n"]
             return result
     except FileNotFoundError:
         exit('Файл со справочником не найден.\n')
@@ -16,30 +16,30 @@ def get_phonebook_from_file(filename: str = FILE_NAME) -> list:
 
 
 def print_phonebook(phonebook_list: list, items_per_page: int = 10, current_page: int = 1) -> None:
-    num_pages = len(phonebook_list) // items_per_page + 1
-    flag_error = 0
+    num_pages: int = len(phonebook_list) // items_per_page + 1
+    flag_error: bool = 0
 
     while True:
-        start_index = (current_page - 1) * items_per_page
-        end_index = start_index + items_per_page
+        start_index: int = (current_page - 1) * items_per_page
+        end_index: int = start_index + items_per_page
 
         print("\033[H\033[J")
         print("\n№   | Имя              | Фамилия                 | Отчество                 "
             "| Название организации        | Рабочий телефон   | Личный телефон")
         for note in phonebook_list[start_index:end_index]:
-            number = note[0]
-            name = note[1]
-            surname = note[2]
-            patronymic = note[3]
-            organization = note[4]
-            work_phone = note[5]
-            cellphone = note[6]
+            number: str = note[0]
+            name: str = note[1]
+            surname: str = note[2]
+            patronymic: str = note[3]
+            organization: str = note[4]
+            work_phone: str = note[5]
+            cellphone: str = note[6]
             print("{:-<150}".format("-"))
             print("{:<6}{:<19}{:<26}{:<27}{:<30}{:<20}{:<20}".format(number, name, surname, patronymic, organization, work_phone, cellphone))
         
         if flag_error == 1:
             print("\nНекорректный ввод. Введите номер между 1 и", num_pages)
-        user_input = input(f"\nВведите номер страницы от 1 до {num_pages} или \"вых\", чтобы вернуться в главное меню: ")
+        user_input: str = input(f"\nВведите номер страницы от 1 до {num_pages} или \"вых\", чтобы вернуться в главное меню: ")
         if user_input == "вых":
             break
         try:
@@ -54,15 +54,15 @@ def print_phonebook(phonebook_list: list, items_per_page: int = 10, current_page
 
 
 def add_new_note(filename: str = FILE_NAME) -> None:
-    name = input("Введите имя: ")
-    surname = input("Введите фамилию: ")
-    patronymic = input("Введите отчество: ")
-    organization = input("Введите название организации: ")
-    work_phone = input("Введите рабочий телефон: ")
-    cellphone = input("Введите личный (сотовый) телефон: ")
-    number = len(get_phonebook_from_file()) + 1
-    new_note = [str(number), name, surname, patronymic, organization, work_phone, cellphone]
-    new_note = "*".join(new_note)
+    name: str = input("Введите имя: ")
+    surname: str = input("Введите фамилию: ")
+    patronymic: str = input("Введите отчество: ")
+    organization: str = input("Введите название организации: ")
+    work_phone: str = input("Введите рабочий телефон: ")
+    cellphone: str = input("Введите личный (сотовый) телефон: ")
+    number: str = len(get_phonebook_from_file()) + 1
+    new_note: str = [str(number), name, surname, patronymic, organization, work_phone, cellphone]
+    new_note: str = "*".join(new_note)
     try:
         with open(filename, "a", encoding="utf-8") as file:
             file.write(new_note + "\n")
@@ -72,12 +72,12 @@ def add_new_note(filename: str = FILE_NAME) -> None:
 
 
 def get_edit_line() -> list:
-    number = input("Введите номер записи, которую хотите отредактировать. Если хотите снова пролистать справочник, введите \"смт\": ")
+    number: str = input("Введите номер записи, которую хотите отредактировать. Если хотите снова пролистать справочник, введите \"смт\": ")
     if number == "смт":
         print_phonebook(get_phonebook_from_file())
         main_menu()
     else:
-        phonebook_list = get_phonebook_from_file()
+        phonebook_list: list = get_phonebook_from_file()
         for note in phonebook_list:
             if note[0] == number:
                 return note
@@ -135,21 +135,21 @@ def get_param_for_find(phonebook_list: list) -> list:
         print("\033[H\033[J")
         return [-1]
     else:
-        param_list = param.split(" ")
+        param_list: list = param.split(" ")
         for par in param_list:
             if par not in ["0", "1", "2", "3", "4", "5", "6"]:
                 print("Таких параметров нет. Попробуйте еще раз.")
                 return get_param_for_find(phonebook_list)
-        local_result_list = phonebook_list
+        local_result_list: list = phonebook_list
         for p in param_list:
-            local_result_list = find_notes(p, local_result_list)
+            local_result_list: list = find_notes(p, local_result_list)
         return local_result_list
 
 
 
 def find_notes(param: str, phonebook_list: list) -> list:
-    value = input(f"Введите значение для поиска для параметра {param}: ")
-    local_result_list = [note for note in phonebook_list if note[int(param)] == value]
+    value: str = input(f"Введите значение для поиска для параметра {param}: ")
+    local_result_list: list = [note for note in phonebook_list if note[int(param)] == value]
     return local_result_list
 
 
@@ -174,7 +174,7 @@ def main_menu() -> None:
         add_edited_note(get_edit_line())
         print("\nЗапись отредактирована.")
     elif param == "4":
-        founded_list = get_param_for_find(get_phonebook_from_file())
+        founded_list: list = get_param_for_find(get_phonebook_from_file())
         if founded_list == [-1]:
             main_menu()
         else:
