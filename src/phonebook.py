@@ -6,6 +6,9 @@ FILE_NAME = "src/source.txt"
 
 
 def get_phonebook_from_file(filename: str = FILE_NAME) -> list:
+    """Функция для получения записей из текстового файла. Возвращает список, где каждый элемент - одна запись
+    справочника (список строк)
+    """
     try:
         with open(filename, "r+", encoding="utf-8") as file:
             result: list = [str.strip("\n").split("*") for str in file.readlines() if str != "\n"]
@@ -16,8 +19,9 @@ def get_phonebook_from_file(filename: str = FILE_NAME) -> list:
 
 
 def print_phonebook(phonebook_list: list, items_per_page: int = 10, current_page: int = 1) -> None:
+    """Служит для вывода отформатированного списка в терминал. Есть возможность перелиствывания страниц справочника"""
     num_pages: int = len(phonebook_list) // items_per_page + 1
-    flag_error: bool = 0
+    flag_error: bool = False
 
     while True:
         start_index: int = (current_page - 1) * items_per_page
@@ -37,7 +41,7 @@ def print_phonebook(phonebook_list: list, items_per_page: int = 10, current_page
             print("{:-<150}".format("-"))
             print("{:<6}{:<19}{:<26}{:<27}{:<30}{:<20}{:<20}".format(number, name, surname, patronymic, organization, work_phone, cellphone))
         
-        if flag_error == 1:
+        if flag_error == True:
             print("\nНекорректный ввод. Введите номер между 1 и", num_pages)
         user_input: str = input(f"\nВведите номер страницы от 1 до {num_pages} или \"вых\", чтобы вернуться в главное меню: ")
         if user_input == "вых":
@@ -47,13 +51,14 @@ def print_phonebook(phonebook_list: list, items_per_page: int = 10, current_page
             if page_number < 1 or page_number > num_pages:
                 raise ValueError
             current_page = page_number
-            flag_error = 0
+            flag_error = False
         except ValueError:
-            flag_error = 1
+            flag_error = True
 
 
 
 def add_new_note(filename: str = FILE_NAME) -> None:
+    """Функция запрашивает у пользователя необходимые параметры, формирует запись и добавляет ее в справочник"""
     name: str = input("Введите имя: ")
     surname: str = input("Введите фамилию: ")
     patronymic: str = input("Введите отчество: ")
@@ -72,6 +77,8 @@ def add_new_note(filename: str = FILE_NAME) -> None:
 
 
 def get_edit_line() -> list:
+    """Функция возвращает запись, которую в дальнейшем нужно будет отредактировать"""
+    flag: bool = False
     number: str = input("Введите номер записи, которую хотите отредактировать. Если хотите снова пролистать справочник, введите \"смт\": ")
     if number == "смт":
         print_phonebook(get_phonebook_from_file())
@@ -80,14 +87,19 @@ def get_edit_line() -> list:
         phonebook_list: list = get_phonebook_from_file()
         for note in phonebook_list:
             if note[0] == number:
+                flag = True
                 return note
-            else:
-                print("\nТакой записи нет. Попробуйте еще раз.\n")
-                return get_edit_line()
+
+        if (flag == False):
+            print("\nТакой записи нет. Попробуйте еще раз.\n")
+            return get_edit_line()
 
 
 
 def add_edited_note(line_for_edit: list) -> None:
+    """Функция запрашивает у пользователя необходимые параметры, формирует запись с новыми параметрами,
+    формирует новое содержимое текстового файла и обновляет его.
+    """
     str_number_in_file = int(line_for_edit[0]) - 1
     print("\nВыбранная запись: ", " ".join(line_for_edit[1:]))
     param = input("""
@@ -119,6 +131,7 @@ def add_edited_note(line_for_edit: list) -> None:
 
 
 def get_param_for_find(phonebook_list: list) -> list:
+    """Возвращает список параметров, по которым будет производиться поиск"""
     param = input("""
 По какому параметру хотите искать? Введите одну или несколько цифр через пробел\n(после последней цифры не нужен):\n
     [0] - Порядковый номер
@@ -148,6 +161,11 @@ def get_param_for_find(phonebook_list: list) -> list:
 
 
 def find_notes(param: str, phonebook_list: list) -> list:
+    """Осуществляет поиск по значению параметра и возвращает соответствующий список.
+    В дальнейшем функция вызывается снова, если поиск ведется по нескольким параметрам. Новы поиск производится
+    уже не по всему справочнику, а среди записей, соответствующих предыдущему критерию.
+    Таким образом поиск происходит быстрее
+    """
     value: str = input(f"Введите значение для поиска для параметра {param}: ")
     local_result_list: list = [note for note in phonebook_list if note[int(param)] == value]
     return local_result_list
@@ -155,6 +173,7 @@ def find_notes(param: str, phonebook_list: list) -> list:
 
 
 def main_menu() -> None:
+    """Главное меню приложения. В зависимости от введенного параметра вызывает нужный функционал."""
     param = input(
     """
     [1] - Показать справочник
